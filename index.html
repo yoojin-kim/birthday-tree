@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Messages</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+        }
+        h1 {
+            color: #ff6347;
+        }
+        form {
+            margin: 20px;
+        }
+        #messages {
+            margin: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            max-width: 600px;
+            margin: auto;
+        }
+        #tree {
+            margin: 20px;
+            font-size: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎉 Birthday Messages 🎉</h1>
+           <label for="message">Write a message:</label><br>
+        <textarea id="message" name="message" rows="4" cols="50" required></textarea><br><br>
+        <button type="submit">Submit</button>
+    </form>
+    <div id="messages"></div>
+    <div id="tree">🌳</div>
+
+    <script>
+        document.getElementById('messageForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const message = document.getElementById('message').value;
+            if (message.trim() !== "") {
+                // Display the message
+                const messageDiv = document.createElement('div');
+                messageDiv.textContent = message;
+                document.getElementById('messages').appendChild(messageDiv);
+
+                // Add an apple to the tree
+                const treeDiv = document.getElementById('tree');
+                treeDiv.textContent += '🍎';
+
+                // Clear the textarea
+                document.getElementById('message').value = '';
+            }
+        });
+    </script>
+</body>
+</html>
