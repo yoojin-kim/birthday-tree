@@ -1,64 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birthday Messages</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f0f8ff;
-        }
-        h1 {
-            color: #ff6347;
-        }
-        form {
-            margin: 20px;
-        }
-        #messages {
-            margin: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            max-width: 600px;
-            margin: auto;
-        }
-        #tree {
-            margin: 20px;
-            font-size: 50px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Birthday Messages</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f8ff;
+    }
+    h1 {
+      color: #ff6347;
+    }
+    form {
+      margin: 20px;
+    }
+    #messages {
+      margin: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      max-width: 600px;
+      margin: auto;
+    }
+    #tree {
+      margin: 20px;
+      font-size: 50px;
+    }
+  </style>
 </head>
 <body>
-    <h1>🎉 Birthday Messages 🎉</h1>
-           <label for="message">Write a message:</label><br>
-        <textarea id="message" name="message" rows="4" cols="50" required></textarea><br><br>
-        <button type="submit">Submit</button>
-    </form>
-    <div id="messages"></div>
-    <div id="tree">🌳</div>
+  <h1>🎉 Birthday Messages 🎉</h1>
+  <form id="messageForm">
+    <label for="message">Write a />
+    <textarea id="message" name="message" rows="4" cols="50" required></textarea><br /><br />
+    <button type="submit">Submit</button>
+  </form>
+  <div id="messages"></div>
+  <div id="tree">🌳</div>
 
-    <script>
-        window.addEventListener('DOMContentLoaded', function () {
-            document.getElementById('messageForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const message = document.getElementById('message').value;
-            if (message.trim() !== "") {
-                // Display the message
-                const messageDiv = document.createElement('div');
-                messageDiv.textContent = message;
-                document.getElementById('messages').appendChild(messageDiv);
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
 
-                // Add an apple to the tree
-                const treeDiv = document.getElementById('tree');
-                treeDiv.textContent += '🍎';
+    const firebaseConfig = {
+      apiKey: "AIzaSyCppujqWcKroEu8B1Vcs4fAQd8T9HZmfyU",
+      authDomain: "birthday-tree.firebaseapp.com",
+      projectId: "birthday-tree",
+      storageBucket: "birthday-tree.firebasestorage.app",
+      messagingSenderId: "861020428758",
+      appId: "1:861020428758:web:005c8b6baa78c689f3ac77"
+    };
 
-                // Clear the textarea
-                document.getElementById('message').value = '';
-            }
-        });
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    window.addEventListener('DOMContentLoaded', function () {
+      const messageForm = document.getElementById('messageForm');
+      const messageInput = document.getElementById('message');
+      const messagesDiv = document.getElementById('messages');
+      const treeDiv = document.getElementById('tree');
+
+      const messagesRef = ref(database, 'messages');
+
+      onValue(messagesRef, (snapshot) => {
+        const data = snapshot.val();
+        messagesDiv.innerHTML = '';
+        treeDiv.innerHTML = '🌳';
+        if (data) {
+          Object.values(data).forEach(message => {
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = message;
+            messagesDiv.appendChild(messageDiv);
+            treeDiv.textContent += '🍎';
+          });
+        }
+      });
+
+      messageForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const message = messageInput.value.trim();
+        if (message !== "") {
+          push(messagesRef, message);
+          messageInput.value = '';
+        }
+      });
     });
-    </script>
+  </script>
 </body>
 </html>
