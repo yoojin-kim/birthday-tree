@@ -40,7 +40,8 @@
     <div id="tree">🌳</div>
 
     <script>
-        document.getElementById('messageForm').addEventListener('submit', function(event) {
+        window.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('messageForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const message = document.getElementById('message').value;
             if (message.trim() !== "") {
@@ -57,6 +58,7 @@
                 document.getElementById('message').value = '';
             }
         });
+    });
     </script>
 </body>
 </html>
