@@ -48,7 +48,7 @@
       animation: twinkle 2s infinite;
       cursor: pointer;
       pointer-events: auto;
-    }
+         }
     @keyframes twinkle {
       0%, 100% { opacity: 0.5; }
       50% { opacity: 1; }
@@ -72,6 +72,14 @@
     #messageModal button {
       margin-top: 10px;
     }
+    #sliderContainer {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1001;
+      color: white;
+    }
   </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
@@ -89,6 +97,8 @@
 
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
+
+    const allStars = [];
 
     function getRandomPastelColor() {
       const hue = Math.floor(Math.random() * 360);
@@ -135,14 +145,14 @@
         modal.style.display = 'block';
       });
 
-      // Store timestamp for future filtering
-      star.dataset.timestamp = timestamp;
       orbit.dataset.timestamp = timestamp;
+      allStars.push({ orbit, timestamp });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       const messageForm = document.getElementById('messageForm');
       const messageInput = document.getElementById('messageInput');
+      const timeSlider = document.getElementById('timeSlider');
 
       messageForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -159,6 +169,8 @@
 
       const messagesRef = ref(database, 'messages');
       onValue(messagesRef, (snapshot) => {
+        allStars.length = 0;
+        document.getElementById('starArea').innerHTML = '';
         snapshot.forEach((childSnapshot) => {
           const data = childSnapshot.val();
           if (data && data.text && data.timestamp) {
@@ -166,11 +178,21 @@
           }
         });
       });
+
+      timeSlider.addEventListener('input', () => {
+        const sliderValue = parseInt(timeSlider.value);
+        const maxTimestamp = Date.now();
+        const minTimestamp = maxTimestamp - (100 - sliderValue) * 60 * 60 * 1000;
+
+        allStars.forEach(({ orbit, timestamp }) => {
+          orbit.style.display = timestamp >= minTimestamp ? 'block' : 'none';
+        });
+      });
     });
   </script>
 </head>
 <body>
-  <h1>🎉 Happy Birthday 🎉</h1>
+  <h1>🎉 - 🎉</h1>
   <h2>Thank you for coming!</h2>
   <form id="messageForm">
     <input type="text" id="messageInput" placeholder="Your ⭐ here..." required>
@@ -182,6 +204,12 @@
   <div id="messageModal">
     <p id="modalText"></p>
     <button onclick="document.getElementById('messageModal').style.display='none'">Close</button>
+  </div>
+
+  <!-- Timeline Slider -->
+  <div id="sliderContainer">
+    <label for="timeSlider">🕒 Filter by Time:</label>
+    <input type="range" id="timeSlider" min="0" max="100" value="100" style="width: 300px;">
   </div>
 </body>
 </html>
