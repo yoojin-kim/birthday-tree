@@ -4,31 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guestbook with Twinkling Stars</title>
+    <title>Happy Birthday</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
+            text-align: center;
+            background-color: #f0f8ff;
         }
-        #messageInput {
-            width: 80%;
-            padding: 10px;
-            margin: 20px auto;
-            display: block;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+        h1 {
+            font-size: 3em;
+            margin-top: 20px;
         }
-        #submitButton {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
         }
         #starArea {
             position: relative;
@@ -47,18 +36,13 @@
             clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
             background-color: transparent;
             animation: twinkle 2s infinite;
+            cursor: pointer;
         }
         @keyframes twinkle {
             0%, 100% { opacity: 0.5; }
             50% { opacity: 1; }
         }
     </style>
-</head>
-<body>
-    <input type="text" id="messageInput" placeholder="Write your message here...">
-    <button id="submitButton">Submit</button>
-    <div id="starArea"></div>
-
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
@@ -78,15 +62,13 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
-
         // Function to get a random pastel color
         function getRandomPastelColor() {
             const hue = Math.floor(Math.random() * 360);
-            const pastelColor = `hsl(${hue}, 100%, 80%)`;
+            const pastelColor = `hsl(${hue}, 100%, 85%)`;
             return pastelColor;
         }
 
-        // Function to create a star
         function createStar(message) {
             const starArea = document.getElementById('starArea');
             const star = document.createElement('div');
@@ -103,37 +85,43 @@
             star.style.transform = `rotate(${angle}deg)`;
             starArea.appendChild(star);
 
-            // Add click event to show the message
             star.addEventListener('click', () => {
                 alert(message);
             });
         }
 
-        // Function to submit a message
-        function submitMessage() {
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageForm = document.getElementById('messageForm');
             const messageInput = document.getElementById('messageInput');
-            const message = messageInput.value.trim();
-            if (message) {
-                const messagesRef = ref(database, 'messages');
-                push(messagesRef, message);
-                createStar(message);
-                messageInput.value = '';
-            }
-        }
 
-        // Load past messages and create stars
-        const messagesRef = ref(database, 'messages');
-        onValue(messagesRef, (snapshot) => {
-            const messages = snapshot.val();
-            for (const key in messages) {
-                if (messages.hasOwnProperty(key)) {
-                    createStar(messages[key]);
+            messageForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const message = messageInput.value;
+                if (message.trim() !== '') {
+                    const messagesRef = ref(database, 'messages');
+                    push(messagesRef, message);
+                    createStar(message);
+                    messageInput.value = '';
                 }
-            }
-        });
+            });
 
-        // Add event listener to the submit button
-        document.getElementById('submitButton').addEventListener('click', submitMessage);
+            const messagesRef = ref(database, 'messages');
+            onValue(messagesRef, (snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    const message = childSnapshot.val();
+                    createStar(message);
+                });
+            });
+        });
     </script>
+</head>
+<body>
+    <h1>Happy Birthday</h1>
+    <h2>Thank you for coming!</h2>
+    <form id="messageForm">
+        <input type="text" id="messageInput" placeholder="Write your message here..." required>
+        <button type="submit">Submit</button>
+    </form>
+    <div id="starArea"></div>
 </body>
 </html>
