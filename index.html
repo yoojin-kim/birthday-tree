@@ -72,9 +72,9 @@
     #messageModal button {
       margin-top: 10px;
     }
-      </style>
+  </style>
   <script type="module">
-    import {initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
     import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
 
     const firebaseConfig = {
@@ -95,7 +95,7 @@
       return `hsl(${hue}, 100%, 85%)`;
     }
 
-    function createStar(message) {
+    function createStar(message, timestamp) {
       const starArea = document.getElementById('starArea');
 
       const orbit = document.createElement('div');
@@ -134,6 +134,10 @@
         modalText.textContent = message;
         modal.style.display = 'block';
       });
+
+      // Store timestamp for future filtering
+      star.dataset.timestamp = timestamp;
+      orbit.dataset.timestamp = timestamp;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -147,9 +151,8 @@
           const messagesRef = ref(database, 'messages');
           push(messagesRef, {
             text: message,
-            timestamp : Date.now()
+            timestamp: Date.now()
           });
-          createStar(message);
           messageInput.value = '';
         }
       });
@@ -157,8 +160,10 @@
       const messagesRef = ref(database, 'messages');
       onValue(messagesRef, (snapshot) => {
         snapshot.forEach((childSnapshot) => {
-          const message = childSnapshot.val();
-          createStar(message);
+          const data = childSnapshot.val();
+          if (data && data.text && data.timestamp) {
+            createStar(data.text, data.timestamp);
+          }
         });
       });
     });
