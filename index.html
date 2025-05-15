@@ -1,159 +1,179 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #012849;
-        }
-        h1 {
-            font-size: 2em;
-            margin-top: 20px;
-            color: #ff6347;
-        }
-        h2 {
-            font-size: 1em;
-            margin-bottom: 20px;
-            color: #817b7a;
-        }
-        #starArea {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 0;
-        }
-        .star {
-            position: absolute;
-            width: 0;
-            height: 0;
-            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-            background-color: transparent;
-            animation: twinkle 2s infinite;
-            cursor: pointer;
-            box-shadow: 0 0 0 4px rgb(253, 233, 149); 
-            pointer-events: auto;
-        }
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-        #messageModal {
-          display: none;
-          position: fixed;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: white;
-          padding: 20px;
-          border-radius: 10px;
-          box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-          z-index: 1000;
-        }
-        #messageModal p {
-          margin: 0;
-          font-size: 1.2em;
-        }
-        #messageModal button {
-          margin-top: 10px;
-        }
-    </style>
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
-        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Birthday</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #012849;
+      overflow: hidden;
+    }
+    h1 {
+      font-size: 3em;
+      margin-top: 20px;
+      color: #ff6347;
+    }
+    h2 {
+      font-size: 2em;
+      margin-bottom: 20px;
+      color: #817b7a;
+    }
+    #starArea {
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .orbit {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: center;
+      animation: rotateOrbit linear infinite;
+    }
+    @keyframes rotateOrbit {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .star {
+      position: absolute;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      background-color: transparent;
+      animation: twinkle 2s infinite;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    #messageModal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+    #messageModal p {
+      margin: 0;
+      font-size: 1.2em;
+    }
+    #messageModal button {
+      margin-top: 10px;
+    }
+      </style>
+  <script type="module">
+    import {initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
 
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCmFxdyItKGD1NfE3fYXEgJBv3hIn27c0Q",
-            authDomain: "b-tree-e6d87.firebaseapp.com",
-            databaseURL: "https://b-tree-e6d87-default-rtdb.firebaseio.com",
-            projectId: "b-tree-e6d87",
-            storageBucket: "b-tree-e6d87.firebasestorage.app",
-            messagingSenderId: "260941327336",
-            appId: "1:260941327336:web:10281ce94eb36d93a9d25d"
-        };
+    const firebaseConfig = {
+      apiKey: "AIzaSyCmFxdyItKGD1NfE3fYXEgJBv3hIn27c0Q",
+      authDomain: "b-tree-e6d87.firebaseapp.com",
+      databaseURL: "https://b-tree-e6d87-default-rtdb.firebaseio.com",
+      projectId: "b-tree-e6d87",
+      storageBucket: "b-tree-e6d87.firebasestorage.app",
+      messagingSenderId: "260941327336",
+      appId: "1:260941327336:web:10281ce94eb36d93a9d25d"
+    };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        // Function to get a random pastel color
-        function getRandomPastelColor() {
-            const hue = Math.floor(Math.random() * 360);
-            const pastelColor = `hsl(${hue}, 100%, 85%)`;
-            return pastelColor;
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    function getRandomPastelColor() {
+      const hue = Math.floor(Math.random() * 360);
+      return `hsl(${hue}, 100%, 85%)`;
+    }
+
+    function createStar(message) {
+      const starArea = document.getElementById('starArea');
+
+      const orbit = document.createElement('div');
+      orbit.className = 'orbit';
+
+      const star = document.createElement('div');
+      star.className = 'star';
+
+      const size = Math.random() * 50 + 20;
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
+      star.style.backgroundColor = getRandomPastelColor();
+      star.style.boxShadow = `0 0 0 ${size * 0.05}px lightgrey`;
+
+      const radius = Math.random() * 200 + 100;
+      const angle = Math.random() * 360;
+      const rad = angle * (Math.PI / 180);
+      const x = Math.cos(rad) * radius;
+      const y = Math.sin(rad) * radius;
+
+      star.style.left = `${50 + x}px`;
+      star.style.top = `${50 + y}px`;
+
+      const duration = Math.random() * 20 + 10;
+      orbit.style.animationDuration = `${duration}s`;
+      if (Math.random() > 0.5) {
+        orbit.style.animationDirection = 'reverse';
+      }
+
+      orbit.appendChild(star);
+      starArea.appendChild(orbit);
+
+      star.addEventListener('click', () => {
+        const modal = document.getElementById('messageModal');
+        const modalText = document.getElementById('modalText');
+        modalText.textContent = message;
+        modal.style.display = 'block';
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const messageForm = document.getElementById('messageForm');
+      const messageInput = document.getElementById('messageInput');
+
+      messageForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const message = messageInput.value;
+        if (message.trim() !== '') {
+          const messagesRef = ref(database, 'messages');
+          push(messagesRef, message);
+          createStar(message);
+          messageInput.value = '';
         }
+      });
 
-        function createStar(message) {
-            const starArea = document.getElementById('starArea');
-            const star = document.createElement('div');
-            star.className = 'star';
-            const size = Math.random() * 50 + 20;
-            star.style.width = `${size}px`;
-            star.style.height = `${size}px`;
-            star.style.backgroundColor = getRandomPastelColor();
-            star.style.boxShadow = `0 0 0 ${size * 0.05}px lightgrey`; 
-            const x = Math.random() * (window.innerWidth - size);
-            const y = Math.random() * (window.innerHeight - size);
-            star.style.left = `${x}px`;
-            star.style.top = `${y}px`;
-            const angle = Math.random() * 360;
-            star.style.transform = `rotate(${angle}deg)`;
-            starArea.appendChild(star);
-
-            star.addEventListener('click', () => {
-              const modal = document.getElementById('messageModal');
-              const modalText = document.getElementById('modalText');
-              modalText.textContent = message;
-              modal.style.display = 'block';
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const messageForm = document.getElementById('messageForm');
-            const messageInput = document.getElementById('messageInput');
-
-            messageForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const message = messageInput.value;
-                if (message.trim() !== '') {
-                    const messagesRef = ref(database, 'messages');
-                    push(messagesRef, message);
-                    createStar(message);
-                    messageInput.value = '';
-                }
-            });
-
-            const messagesRef = ref(database, 'messages');
-            onValue(messagesRef, (snapshot) => {
-                snapshot.forEach((childSnapshot) => {
-                    const message = childSnapshot.val();
-                    createStar(message);
-                });
-            });
+      const messagesRef = ref(database, 'messages');
+      onValue(messagesRef, (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+          const message = childSnapshot.val();
+          createStar(message);
         });
-    </script>
+      });
+    });
+  </script>
 </head>
 <body>
-    <h1>🎉 Birthday Messages 🎉</h1>
-    <h2>Thank you for coming!</h2>
-    <form id="messageForm">
-        <input type="text" id="messageInput" placeholder="Your ⭐ here..." required>
-        <button type="submit">Shoot</button>
-    </form>
-    <div id="starArea"></div>
-    <!-- Modal for displaying messages -->
-    <div id="messageModal">
-      <p id="modalText"></p>
-      <button onclick="document.getElementById('messageModal').style.display='none'">Close</button>
-   </div>
+  <h1>🎉 Birthday Messages 🎉</h1>
+  <h2>Thank you for coming!</h2>
+  <form id="messageForm">
+    <input type="text" id="messageInput" placeholder="Your ⭐ here..." required>
+    <button type="submit">Shoot</button>
+  </form>
+  <div id="starArea"></div>
+
+  <!-- Modal for displaying messages -->
+  <div id="messageModal">
+    <p id="modalText"></p>
+    <button onclick="document.getElementById('messageModal').style.display='none'">Close</button>
+  </div>
 </body>
 </html>
