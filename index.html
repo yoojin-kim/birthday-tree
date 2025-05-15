@@ -145,7 +145,10 @@
         const message = messageInput.value;
         if (message.trim() !== '') {
           const messagesRef = ref(database, 'messages');
-          push(messagesRef, message);
+          push(messagesRef, {
+            text: message,
+            timestamp : Date.now()
+          });
           createStar(message);
           messageInput.value = '';
         }
@@ -162,7 +165,7 @@
   </script>
 </head>
 <body>
-  <h1>🎉 Birthday Messages 🎉</h1>
+  <h1>🎉 Happy Birthday 🎉</h1>
   <h2>Thank you for coming!</h2>
   <form id="messageForm">
     <input type="text" id="messageInput" placeholder="Your ⭐ here..." required>
