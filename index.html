@@ -40,10 +40,30 @@
             animation: twinkle 2s infinite;
             cursor: pointer;
             box-shadow: 0 0 0 4px rgb(253, 233, 149); 
+            pointer-events: auto;
         }
         @keyframes twinkle {
             0%, 100% { opacity: 0.5; }
             50% { opacity: 1; }
+        }
+        #messageModal {
+          display: none;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: white;
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+          z-index: 1000;
+        }
+        #messageModal p {
+          margin: 0;
+          font-size: 1.2em;
+        }
+        #messageModal button {
+          margin-top: 10px;
         }
     </style>
     <script type="module">
@@ -90,7 +110,10 @@
             starArea.appendChild(star);
 
             star.addEventListener('click', () => {
-                alert(message);
+              const modal = document.getElementById('messageModal');
+              const modalText = document.getElementById('modalText');
+              modalText.textContent = message;
+              modal.style.display = 'block';
             });
         }
 
@@ -127,5 +150,10 @@
         <button type="submit">Shoot</button>
     </form>
     <div id="starArea"></div>
+    <!-- Modal for displaying messages -->
+    <div id="messageModal">
+      <p id="modalText"></p>
+      <button onclick="document.getElementById('messageModal').style.display='none'">Close</button>
+   </div>
 </body>
 </html>
