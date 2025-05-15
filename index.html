@@ -48,8 +48,8 @@
       animation: twinkle 2s infinite;
       cursor: pointer;
       pointer-events: auto;
-         }
-    @keyframes twinkle {
+    }
+      @keyframes twinkle {
       0%, 100% { opacity: 0.5; }
       50% { opacity: 1; }
     }
@@ -70,16 +70,7 @@
       font-size: 1.2em;
     }
     #messageModal button {
-      margin-top: 10px;
-    }
-    #sliderContainer {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1001;
-      color: white;
-    }
+      }
   </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
@@ -98,16 +89,31 @@
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
 
-    const allStars = [];
+    function detectLanguage(text) {
+      if (/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text)) return 'korean';
+      if (/[äöüßÄÖÜ]/.test(text)) return 'german';
+      if (/^[A-Za-z0-9\s.,!?'"()\-]+$/.test(text)) return 'english';
+      return 'other';
+    }
 
-    function getRandomPastelColor() {
-      const hue = Math.floor(Math.random() * 360);
-      return `hsl(${hue}, 100%, 85%)`;
+    function getClusterProperties(language) {
+      switch (language) {
+        case 'korean':
+          return { color: 'pink', radiusRange: [100, 150] };
+        case 'german':
+          return { color: 'lightblue', radiusRange: [160, 210] };
+        case 'english':
+          return { color: 'lightgreen', radiusRange: [220, 270] };
+        default:
+          return { color: 'lightgray', radiusRange: [280, 330] };
+      }
     }
 
     function createStar(message, timestamp) {
-      const starArea = document.getElementById('starArea');
+      const language = detectLanguage(message);
+      const { color, radiusRange } = getClusterProperties(language);
 
+      const starArea = document.getElementById('starArea');
       const orbit = document.createElement('div');
       orbit.className = 'orbit';
 
@@ -117,10 +123,10 @@
       const size = Math.random() * 50 + 20;
       star.style.width = `${size}px`;
       star.style.height = `${size}px`;
-      star.style.backgroundColor = getRandomPastelColor();
+      star.style.backgroundColor = color;
       star.style.boxShadow = `0 0 0 ${size * 0.05}px lightgrey`;
 
-      const radius = Math.random() * 200 + 100;
+      const radius = Math.random() * (radiusRange[1] - radiusRange[0]) + radiusRange[0];
       const angle = Math.random() * 360;
       const rad = angle * (Math.PI / 180);
       const x = Math.cos(rad) * radius;
@@ -144,15 +150,11 @@
         modalText.textContent = message;
         modal.style.display = 'block';
       });
-
-      orbit.dataset.timestamp = timestamp;
-      allStars.push({ orbit, timestamp });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       const messageForm = document.getElementById('messageForm');
       const messageInput = document.getElementById('messageInput');
-      const timeSlider = document.getElementById('timeSlider');
 
       messageForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -169,7 +171,6 @@
 
       const messagesRef = ref(database, 'messages');
       onValue(messagesRef, (snapshot) => {
-        allStars.length = 0;
         document.getElementById('starArea').innerHTML = '';
         snapshot.forEach((childSnapshot) => {
           const data = childSnapshot.val();
@@ -178,21 +179,11 @@
           }
         });
       });
-
-      timeSlider.addEventListener('input', () => {
-        const sliderValue = parseInt(timeSlider.value);
-        const maxTimestamp = Date.now();
-        const minTimestamp = maxTimestamp - (100 - sliderValue) * 60 * 60 * 1000;
-
-        allStars.forEach(({ orbit, timestamp }) => {
-          orbit.style.display = timestamp >= minTimestamp ? 'block' : 'none';
-        });
-      });
     });
   </script>
 </head>
 <body>
-  <h1>🎉 - 🎉</h1>
+  <h1>🎉 + 🎉</h1>
   <h2>Thank you for coming!</h2>
   <form id="messageForm">
     <input type="text" id="messageInput" placeholder="Your ⭐ here..." required>
@@ -204,12 +195,6 @@
   <div id="messageModal">
     <p id="modalText"></p>
     <button onclick="document.getElementById('messageModal').style.display='none'">Close</button>
-  </div>
-
-  <!-- Timeline Slider -->
-  <div id="sliderContainer">
-    <label for="timeSlider">🕒 Filter by Time:</label>
-    <input type="range" id="timeSlider" min="0" max="100" value="100" style="width: 300px;">
   </div>
 </body>
 </html>
