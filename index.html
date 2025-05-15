@@ -39,6 +39,7 @@
             background-color: transparent;
             animation: twinkle 2s infinite;
             cursor: pointer;
+            box-shadow: 0 0 0 2px lightgrey; 
         }
         @keyframes twinkle {
             0%, 100% { opacity: 0.5; }
@@ -79,6 +80,7 @@
             star.style.width = `${size}px`;
             star.style.height = `${size}px`;
             star.style.backgroundColor = getRandomPastelColor();
+            star.style.boxShadow = `0 0 0 ${size * 0.05}px lightgrey`; 
             const x = Math.random() * (window.innerWidth - size);
             const y = Math.random() * (window.innerHeight - size);
             star.style.left = `${x}px`;
@@ -121,8 +123,8 @@
     <h1>🎉 Birthday Messages 🎉</h1>
     <h2>Thank you for coming!</h2>
     <form id="messageForm">
-        <input type="text" id="messageInput" placeholder=" Write me a short message to light up the sky!..." required>
-        <button type="submit">Submit</button>
+        <input type="text" id="messageInput" placeholder="Your ⭐ here..." required>
+        <button type="submit">Shoot</button>
     </form>
     <div id="starArea"></div>
 </body>
