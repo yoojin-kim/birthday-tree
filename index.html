@@ -52,6 +52,31 @@
   50% { opacity: 1; }
 }
 </style>
+
+<style>
+#starArea {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+.star {
+  position: absolute;
+  width: 0;
+  height: 0;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  background-color: transparent;
+  animation: twinkle 2s infinite;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+</style>
 </head>
 <body>
   <h1>🎉 Happy Birthday  🎉</h1>
@@ -109,7 +134,8 @@
         if (message !== "") {
           push(messagesRef, message);
           console.log("Message submitted:", message); // Debug log
-          messageInput.value = ''; createStar();
+          messageInput.value = '';
+createStar(); createStar();
         }
       });
     });
@@ -138,6 +164,31 @@ function createStar() {
   star.style.transform = `rotate(${angle}deg)`;
   starArea.appendChild(star);
   setTimeout(() => star.remove(), 4000); // Remove after 4 seconds
+}
+</script>
+<div id="starArea"></div>
+<script>
+function getRandomPastelColor() {
+  const hue = Math.floor(Math.random() * 360);
+  const pastelColor = `hsl(${hue}, 100%, 80%)`;
+  return pastelColor;
+}
+
+function createStar() {
+  const starArea = document.getElementById('starArea');
+  const star = document.createElement('div');
+  star.className = 'star';
+  const size = Math.random() * 50 + 20;
+  star.style.width = `${size}px`;
+  star.style.height = `${size}px`;
+  star.style.backgroundColor = getRandomPastelColor();
+  const x = Math.random() * (window.innerWidth - size);
+  const y = Math.random() * (window.innerHeight - size);
+  star.style.left = `${x}px`;
+  star.style.top = `${y}px`;
+  const angle = Math.random() * 360;
+  star.style.transform = `rotate(${angle}deg)`;
+  starArea.appendChild(star);
 }
 </script>
 </body>
