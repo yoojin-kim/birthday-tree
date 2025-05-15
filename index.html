@@ -1,227 +1,139 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Birthday Messages</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f0f8ff;
-    }
-    h1 {
-      color: #ff6347;
-    }
-    form {
-      margin: 20px;
-    }
-    #messages {
-      margin: 20px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      background-color: #fff;
-      max-width: 600px;
-      margin: auto;
-    }
-    #tree {
-      margin: 20px;
-      font-size: 50px;
-    }
-  
-#starArea {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 0;
-}
-.star {
-  position: absolute;
-  width: 0;
-  height: 0;
-  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-  background-color: transparent;
-  animation: twinkle 2s infinite;
-}
-@keyframes twinkle {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guestbook with Twinkling Stars</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        #messageInput {
+            width: 80%;
+            padding: 10px;
+            margin: 20px auto;
+            display: block;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        #submitButton {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #starArea {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+        .star {
+            position: absolute;
+            width: 0;
+            height: 0;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            background-color: transparent;
+            animation: twinkle 2s infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+    </style>
 </head>
 <body>
-  <h1>🎉 Happy Birthday  🎉</h1>
-  <form id="messageForm">
-    <label for="message">Write a message:</label><br />
-    <textarea id="message" name="message" rows="4" cols="50" required></textarea><br /><br />
-    <button type="submit">Submit</button>
-  </form>
-  <div id="messages"></div>
-  
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCmFxdyItKGD1NfE3fYXEgJBv3hIn27c0Q",
-      authDomain: "b-tree-e6d87.firebaseapp.com",
-      databaseURL: "https://b-tree-e6d87-default-rtdb.firebaseio.com",
-      projectId: "b-tree-e6d87",
-      storageBucket: "b-tree-e6d87.firebasestorage.app",
-      messagingSenderId: "260941327336",
-      appId: "1:260941327336:web:10281ce94eb36d93a9d25d"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
-
-    window.addEventListener('DOMContentLoaded', function () {
-      const messageForm = document.getElementById('messageForm');
-      const messageInput = document.getElementById('message');
-      const messagesDiv = document.getElementById('messages');
-      const treeDiv = document.getElementById('tree');
-
-      const messagesRef = ref(database, 'messages');
-
-      onValue(messagesRef, (snapshot) => {
-        const data = snapshot.val();
-        console.log("Loaded messages:", data); // Debug log
-        messagesDiv.innerHTML = '';
-        treeDiv.innerHTML = '🌳';
-        if (data) {
-          Object.values(data).forEach(message => {
-            const messageDiv = document.createElement('div');
-            messageDiv.textContent = message;
-            messagesDiv.appendChild(messageDiv);
-            treeDiv.textContent += '';
-          });
-        }
-      });
-
-      messageForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        const message = messageInput.value.trim();
-        if (message !== "") {
-          push(messagesRef, message);
-          console.log("Message submitted:", message); // Debug log
-          messageInput.value = ''; createStar();
-        }
-      });
-    });
-  </script>
-<div id="starArea"></div>
-<script>
-function getRandomPastelColor() {
-  const hue = Math.floor(Math.random() * 360);
-  const pastelColor = `hsl(${hue}, 100%, 85%)`;
-  return pastelColor;
-}
-
-function createStar() {
-  const starArea = document.getElementById('starArea');
-  const star = document.createElement('div');
-  star.className = 'star';
-  const size = Math.random() * 50 + 20;
-  star.style.width = `${size}px`;
-  star.style.height = `${size}px`;
-  star.style.backgroundColor = getRandomPastelColor();
-  const x = Math.random() * (window.innerWidth - size);
-  const y = Math.random() * (window.innerHeight - size);
-  star.style.left = `${x}px`;
-  star.style.top = `${y}px`;
-  const angle = Math.random() * 360;
-  star.style.transform = `rotate(${angle}deg)`;
-  starArea.appendChild(star);
-  setTimeout(() => star.remove(), 4000); // Remove after 4 seconds
-}
-</script>
-
+    <input type="text" id="messageInput" placeholder="Write your message here...">
+    <button id="submitButton">Submit</button>
     <div id="starArea"></div>
-    <script>
-    function getRandomPastelColor() {
-        const hue = Math.floor(Math.random() * 360);
-        const pastelColor = `hsl(${hue}, 100%, 80%)`;
-        return pastelColor;
-    }
 
-    function createStar(message) {
-        const starArea = document.getElementById('starArea');
-        const star = document.createElement('div');
-        star.className = 'star';
-        const size = Math.random() * 50 + 20;
-        star.style.width = `${size}px`;
-        star.style.height = `${size}px`;
-        star.style.backgroundColor = getRandomPastelColor();
-        const x = Math.random() * (window.innerWidth - size);
-        const y = Math.random() * (window.innerHeight - size);
-        star.style.left = `${x}px`;
-        star.style.top = `${y}px`;
-        const angle = Math.random() * 360;
-        star.style.transform = `rotate(${angle}deg)`;
-        star.setAttribute('data-message', message);
-        star.addEventListener('click', function() {
-            alert(this.getAttribute('data-message'));
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmFxdyItKGD1NfE3fYXEgJBv3hIn27c0Q",
+            authDomain: "b-tree-e6d87.firebaseapp.com",
+            databaseURL: "https://b-tree-e6d87-default-rtdb.firebaseio.com",
+            projectId: "b-tree-e6d87",
+            storageBucket: "b-tree-e6d87.firebasestorage.app",
+            messagingSenderId: "260941327336",
+            appId: "1:260941327336:web:10281ce94eb36d93a9d25d"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Function to get a random pastel color
+        function getRandomPastelColor() {
+            const hue = Math.floor(Math.random() * 360);
+            const pastelColor = `hsl(${hue}, 100%, 80%)`;
+            return pastelColor;
+        }
+
+        // Function to create a star
+        function createStar(message) {
+            const starArea = document.getElementById('starArea');
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 50 + 20;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.backgroundColor = getRandomPastelColor();
+            const x = Math.random() * (window.innerWidth - size);
+            const y = Math.random() * (window.innerHeight - size);
+            star.style.left = `${x}px`;
+            star.style.top = `${y}px`;
+            const angle = Math.random() * 360;
+            star.style.transform = `rotate(${angle}deg)`;
+            starArea.appendChild(star);
+
+            // Add click event to show the message
+            star.addEventListener('click', () => {
+                alert(message);
+            });
+        }
+
+        // Function to submit a message
+        function submitMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            if (message) {
+                const messagesRef = ref(database, 'messages');
+                push(messagesRef, message);
+                createStar(message);
+                messageInput.value = '';
+            }
+        }
+
+        // Load past messages and create stars
+        const messagesRef = ref(database, 'messages');
+        onValue(messagesRef, (snapshot) => {
+            const messages = snapshot.val();
+            for (const key in messages) {
+                if (messages.hasOwnProperty(key)) {
+                    createStar(messages[key]);
+                }
+            }
         });
-        starArea.appendChild(star);
-    }
 
-    // Firebase configuration
-    var firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_AUTH_DOMAIN",
-        databaseURL: "YOUR_DATABASE_URL",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_STORAGE_BUCKET",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID"
-    };
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-
-    // Reference messages collection
-    var messagesRef = firebase.database().ref('messages');
-
-    // Listen for form submit
-    document.getElementById('messageForm').addEventListener('submit', submitForm);
-
-    // Submit form
-    function submitForm(e) {
-        e.preventDefault();
-
-        // Get values
-        var message = document.getElementById('messageInput').value;
-
-        // Save message
-        saveMessage(message);
-
-        // Create star with message
-        createStar(message);
-
-        // Clear form
-        document.getElementById('messageForm').reset();
-    }
-
-    // Save message to firebase
-    function saveMessage(message) {
-        var newMessageRef = messagesRef.push();
-        newMessageRef.set({
-            message: message
-        });
-    }
-
-    // Retrieve messages and create stars on page load
-    messagesRef.on('value', function(snapshot) {
-        snapshot.forEach(function(childSnapshot) {
-            var message = childSnapshot.val().message;
-            createStar(message);
-        });
-    });
+        // Add event listener to the submit button
+        document.getElementById('submitButton').addEventListener('click', submitMessage);
     </script>
-    </body>
-    
+</body>
 </html>
