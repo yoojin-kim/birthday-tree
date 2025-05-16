@@ -72,9 +72,9 @@
     #messageModal button {
       margin-top: 10px;
     }
-  </style>
+      </style>
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+    import {initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
     import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
 
     const firebaseConfig = {
@@ -90,31 +90,14 @@
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
 
-    function detectLanguage(text) {
-      if (/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text)) return 'korean';
-      if (/[äöüßÄÖÜ]/.test(text)) return 'german';
-      if (/^[A-Za-z0-9\s.,!?'"()\-]+$/.test(text)) return 'english';
-      return 'other';
+    function getRandomPastelColor() {
+      const hue = Math.floor(Math.random() * 360);
+      return `hsl(${hue}, 100%, 85%)`;
     }
 
-    function getClusterProperties(language) {
-      switch (language) {
-        case 'korean':
-          return { color: 'pink', radiusRange: [100, 150] };
-        case 'german':
-          return { color: 'lightblue', radiusRange: [160, 210] };
-        case 'english':
-          return { color: 'lightgreen', radiusRange: [220, 270] };
-        default:
-          return { color: 'lightgray', radiusRange: [280, 330] };
-      }
-    }
-
-    function createStar(message, timestamp) {
-      const language = detectLanguage(message);
-      const { color, radiusRange } = getClusterProperties(language);
-
+    function createStar(message) {
       const starArea = document.getElementById('starArea');
+
       const orbit = document.createElement('div');
       orbit.className = 'orbit';
 
@@ -124,10 +107,10 @@
       const size = Math.random() * 50 + 20;
       star.style.width = `${size}px`;
       star.style.height = `${size}px`;
-      star.style.backgroundColor = color;
+      star.style.backgroundColor = getRandomPastelColor();
       star.style.boxShadow = `0 0 0 ${size * 0.05}px lightgrey`;
 
-      const radius = Math.random() * (radiusRange[1] - radiusRange[0]) + radiusRange[0];
+      const radius = Math.random() * 200 + 100;
       const angle = Math.random() * 360;
       const rad = angle * (Math.PI / 180);
       const x = Math.cos(rad) * radius;
@@ -164,28 +147,25 @@
           const messagesRef = ref(database, 'messages');
           push(messagesRef, {
             text: message,
-            timestamp: Date.now()
+            timestamp : Date.now()
           });
+          createStar(message);
           messageInput.value = '';
         }
       });
 
       const messagesRef = ref(database, 'messages');
       onValue(messagesRef, (snapshot) => {
-        const starArea = document.getElementById('starArea');
-        starArea.innerHTML = ''; // Clear existing stars
         snapshot.forEach((childSnapshot) => {
-          const data = childSnapshot.val();
-          if (data && typeof data.text === 'string' && typeof data.timestamp === 'number') {
-            createStar(data.text, data.timestamp);
-          }
+          const message = childSnapshot.val();
+          createStar(message);
         });
       });
     });
   </script>
 </head>
 <body>
-  <h1>🎉 - 🎉</h1>
+  <h1>🎉 Happy Birthday 🎉</h1>
   <h2>Thank you for coming!</h2>
   <form id="messageForm">
     <input type="text" id="messageInput" placeholder="Your ⭐ here..." required>
